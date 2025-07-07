@@ -1,0 +1,59 @@
+# This workflow is designed to build a Gradle project and upload the build artifacts.
+#
+# To use this workflow:
+# 1. Create a directory named `.github/workflows` in the root of your repository if it doesn't already exist.
+# 2. Save this file as `build.yml` (or any other `.yml` name) inside the `.github/workflows` directory.
+# 3. Push the changes to your repository. GitHub Actions will automatically detect and run this workflow.
+
+name: Java CI with Gradle
+
+# Controls when the workflow will run
+on:
+  # Triggers the workflow on push or pull request events but only for the "main" branch
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+jobs:
+  # This workflow contains a single job called "build"
+  build:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Step 1: Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      # Step 2: Set up JDK 17. You can change '17' to your desired Java version.
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin' # Eclipse Temurin is a popular and well-supported distribution
+
+      # Step 3: Set up Gradle with caching
+      # This action sets up a Gradle environment for use in actions, and caches dependencies and wrappers to improve workflow execution time.
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v3
+
+      # Step 4: Build with Gradle
+      # This command executes the 'build' task using the Gradle wrapper.
+      # The Gradle wrapper (`./gradlew`) is the recommended way to execute a Gradle build.
+      - name: Build with Gradle
+        run: ./gradlew build
+
+      # Step 5: Upload build artifact
+      # This step uploads the build output (usually found in the `build/libs` directory) as an artifact.
+      # You can download this artifact from the workflow run's summary page.
+      # The path should be adjusted if your project's output is in a different directory.
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: my-gradle-project-artifact # You can name your artifact anything you like
+          path: build/libs/ # This path points to where the JAR/WAR files are typically generated
